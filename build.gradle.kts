@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Rick Busarow
+ * Copyright (C) 2022 Rick Busarow
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ buildscript {
 
 plugins {
   kotlin("jvm")
-  id("com.github.ben-manes.versions") version "0.39.0"
+  id("com.github.ben-manes.versions") version "0.41.0"
   id("io.gitlab.arturbosch.detekt") version "1.18.1"
   id("com.rickbusarow.module-check") version "0.11.2"
   id("com.osacky.doctor") version "0.7.3"

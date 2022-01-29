@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Rick Busarow
+ * Copyright (C) 2022 Rick Busarow
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,11 +43,11 @@ private fun FileSpec.Builder.annotateFile(): FileSpec.Builder =
       addMember("\"DEPRECATION\"")
     }
   )
-    .addAnnotation(
-      AnnotationSpec(ClassName("kotlin", "OptIn")) {
-        addMember("%L::class", ClassNames.internalTangleApi)
-      }
-    )
+    // .addAnnotation(
+    //   AnnotationSpec(ClassName("kotlin", "OptIn")) {
+    //     addMember("%L::class", ClassNames.internalTangleApi)
+    //   }
+    // )
 
 fun FileSpec.Companion.buildFile(
   packageName: String,
