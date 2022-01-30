@@ -105,7 +105,6 @@ tasks.withType<Detekt> {
   this.jvmTarget = "1.8"
 }
 
-
 fun isNonStable(version: String): Boolean {
   val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
   val regex = "^[0-9,.v-]+(-r)?$".toRegex()
