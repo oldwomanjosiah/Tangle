@@ -15,7 +15,6 @@
 
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import io.gitlab.arturbosch.detekt.detekt
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 
@@ -37,14 +36,15 @@ buildscript {
   }
 }
 
+@Suppress("UnstableApiUsage")
 plugins {
   kotlin("jvm")
+  alias(libs.plugins.detekt)
+  alias(libs.plugins.gradleDoctor)
+  alias(libs.plugins.taskTree)
   id("com.github.ben-manes.versions") version "0.41.0"
-  id("io.gitlab.arturbosch.detekt") version "1.18.1"
-  id("com.rickbusarow.module-check") version "0.11.2"
-  id("com.osacky.doctor") version "0.7.3"
-  id("com.dorongold.task-tree") version "2.1.0"
-  id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.7.1"
+  id("com.rickbusarow.module-check") version "0.11.3"
+  id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.8.0"
   base
   dokka
   knit
@@ -71,17 +71,10 @@ allprojects {
   }
 }
 
-@Suppress("DEPRECATION")
 detekt {
 
   parallel = true
   config = files("$rootDir/detekt/detekt-config.yml")
-
-  reports {
-    xml.enabled = false
-    html.enabled = true
-    txt.enabled = false
-  }
 }
 
 tasks.withType<DetektCreateBaselineTask> {
@@ -97,7 +90,13 @@ tasks.withType<DetektCreateBaselineTask> {
 
 tasks.withType<Detekt> {
 
-  setSource(files(rootDir))
+  reports {
+    xml.required.set(true)
+    html.required.set(true)
+    txt.required.set(false)
+  }
+
+  setSource(files(projectDir))
 
   include("**/*.kt", "**/*.kts")
   exclude("**/resources/**", "**/build/**", "**/src/test/java**", "**/src/test/kotlin**")
@@ -105,6 +104,7 @@ tasks.withType<Detekt> {
   // Target version of the generated JVM bytecode. It is used for type resolution.
   this.jvmTarget = "1.8"
 }
+
 
 fun isNonStable(version: String): Boolean {
   val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
@@ -127,7 +127,7 @@ allprojects {
 
   configure<KtlintExtension> {
     debug.set(false)
-
+    version.set("0.43.2")
     disabledRules.set(
       setOf(
         "no-wildcard-imports",

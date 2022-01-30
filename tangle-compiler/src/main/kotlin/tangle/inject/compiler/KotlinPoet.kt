@@ -15,7 +15,10 @@
 
 package tangle.inject.compiler
 
-import com.squareup.anvil.compiler.internal.*
+import com.squareup.anvil.compiler.internal.argumentType
+import com.squareup.anvil.compiler.internal.asClassName
+import com.squareup.anvil.compiler.internal.requireClassDescriptor
+import com.squareup.anvil.compiler.internal.requireFqName
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.jvm.jvmSuppressWildcards
 import org.jetbrains.kotlin.builtins.isFunctionType
@@ -43,11 +46,11 @@ private fun FileSpec.Builder.annotateFile(): FileSpec.Builder =
       addMember("\"DEPRECATION\"")
     }
   )
-    // .addAnnotation(
-    //   AnnotationSpec(ClassName("kotlin", "OptIn")) {
-    //     addMember("%L::class", ClassNames.internalTangleApi)
-    //   }
-    // )
+    .addAnnotation(
+      AnnotationSpec(ClassName("kotlin", "OptIn")) {
+        addMember("%L::class", ClassNames.internalTangleApi)
+      }
+    )
 
 fun FileSpec.Companion.buildFile(
   packageName: String,

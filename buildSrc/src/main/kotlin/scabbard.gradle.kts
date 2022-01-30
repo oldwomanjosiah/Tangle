@@ -26,7 +26,7 @@ configurations.all {
   resolutionStrategy {
 
     eachDependency {
-      if (requested.module.name == "com.github.kittinunf.result:result") {
+      if (requested.module.toString() == "com.github.kittinunf.result:result") {
         useVersion("3.0.1")
         because("Transitive dependency of Scabbard, currently not available on mavenCentral()")
       }
