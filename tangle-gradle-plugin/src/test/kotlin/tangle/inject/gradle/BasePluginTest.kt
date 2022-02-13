@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Rick Busarow
+ * Copyright (C) 2022 Rick Busarow
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,10 +28,10 @@ import java.io.File
 import kotlin.properties.Delegates
 import io.kotest.matchers.shouldBe as kotestShouldBe
 
-public val kotlinVersions: List<String> = listOf("1.5.0", "1.5.30")
-public val agpVersions: List<String> = listOf(/*"4.2.1",*/ "7.0.2")
-public val gradleVersions: List<String> = listOf("7.0.2", /*"7.1.1",*/ "7.2")
-public val anvilVersions: List<String> = listOf(/*"2.3.0",*/ "2.3.4")
+public val kotlinVersions: List<String> = listOf("1.6.10")
+public val agpVersions: List<String> = listOf("7.0.4", "7.1.0")
+public val gradleVersions: List<String> = listOf("7.0.2", "7.4")
+public val anvilVersions: List<String> = listOf("2.3.4", "2.3.11-1-6-10")
 
 public abstract class BasePluginTest : HermitJUnit5() {
 
@@ -54,6 +54,9 @@ public abstract class BasePluginTest : HermitJUnit5() {
     .replace(
       "\\s*BUILD SUCCESSFUL in .*\\s*\\d* actionable task: \\d* executed\\s*".toRegex(), ""
     )
+    // Gradle TestKit has memory management issues when testing against multiple versions.
+    // This message happens randomly during tests and can be safely ignored.
+    .replace("Daemon will be stopped at the end of the build after running out of JVM memory", "")
     .lines()
     .filterNot { it.isBlank() }
     .filterNot { it.startsWith("api androidx") }
@@ -85,18 +88,22 @@ public abstract class BasePluginTest : HermitJUnit5() {
       kotlinVersions.flatMap { kotlin ->
         agpVersions.flatMap { agp ->
           anvilVersions.map { anvil ->
-            val scope = TestScope(
+            TestScope(
               testInfo = testInfo,
               gradleVersion = gradle,
               kotlinVersion = kotlin,
               agpVersion = agp,
               anvilVersion = anvil
             )
-            DynamicTest.dynamicTest(scope.toString()) {
-              scope.testProjectDir.deleteRecursively()
-              action.invoke(scope)
-            }
           }
+            // AGP 7.1.0 and up has a minimum Gradle version of 7.2
+            .filterNot { it.agpVersion != "7.0.4" && it.gradleVersion == "7.0.2" }
+            .map { scope ->
+              DynamicTest.dynamicTest(scope.toString()) {
+                scope.testProjectDir.deleteRecursively()
+                action.invoke(scope)
+              }
+            }
         }
       }
     }
